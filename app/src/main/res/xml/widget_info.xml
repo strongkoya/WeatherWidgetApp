@@ -1,0 +1,12 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:updatePeriodMillis="900000"
+    android:previewImage="@drawable/logo"
+    android:initialLayout="@layout/widget_layout"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen|keyguard">
+    <!-- Définir la taille du widget à 5x2 -->
+    <span style="font-weight:bold">&lt;span android:layout_width="250dp"
+        android:layout_height="110dp" /&gt;</span>
+</appwidget-provider>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="15dp">
+
+  <ImageView
+      android:id="@+id/weather"
+      android:layout_width="100dp"
+      android:layout_height="100dp"
+      android:src="@drawable/logo"
+      tools:ignore="ContentDescription" />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      android:layout_marginLeft="8dp"
+      android:orientation="vertical"
+      tools:ignore="RtlHardcoded">
+
+    <TextView android:textColor="#FBFBFB"
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="01/01/2000"/>
+
+    <TextView android:textColor="#FBFBFB"
+        android:id="@+id/description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="description"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+      <FrameLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content">
+
+        <TextView android:textColor="#FBFBFB"
+            android:id="@+id/centigrade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="25 °C"/>
+
+
+
+      </FrameLayout>
+
+      <TextView android:textColor="#FBFBFB"
+          android:id="@+id/wind"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="16dp"
+          android:textAppearance="?android:attr/textAppearanceLarge"
+          android:text="0 km/h"/>
+
+    </LinearLayout>
+
+    <TextView android:textColor="#FBFBFB"
+        android:id="@+id/pressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/precipitation"/>
+
+    <TextView android:textColor="#FBFBFB"
+        android:id="@+id/humidity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="humidity"/>
+
+  </LinearLayout>
+
+</LinearLayout>
