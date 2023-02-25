@@ -1,26 +1,15 @@
 package com.example.weatherapp;
 
-import android.Manifest;
+
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Criteria;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -39,40 +28,15 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 public class WeatherWidget extends AppWidgetProvider {
 
-    private static RemoteViews views;
 
-    private Map<CharSequence, Integer> imageMap;
-
-    private String location;
-    private String date;
-    private int temperature;
-    private String centigrade;
-    private String fahrenheit;
-    private String description;
-    private String wind;
-    private String precipitation;
-    private String humidity;
-
-
-
-
-
-    private String format;
 
 
    // onAppWidgetOptionsChanged
@@ -105,7 +69,7 @@ public class WeatherWidget extends AppWidgetProvider {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         if(isNetworkAvailable(context)&&preferences.contains(MainActivity.WWPREF_CITY)){
-            FindWeather(preferences.getString(MainActivity.WWPREF_CITY, ""), views, preferences, context, appWidgetIds);
+            FindWeather(preferences.getString(MainActivity.WWPREF_CITY, ""), views, context, appWidgetIds);
         }
 
        else if (preferences.contains(MainActivity.WWPREF_TEMP))
@@ -118,11 +82,9 @@ public class WeatherWidget extends AppWidgetProvider {
             views.setTextViewText(R.id.pressure,"Pressure :"+preferences.getString(MainActivity.WWPREF_PRSS, "")+" Pa");
             views.setTextViewText(R.id.humidity, "Humidity :"+preferences.getString(MainActivity.WWPREF_HUMD, "")+" %");
 
-            //
-           // views.setImageViewUri(R.id.weather, Uri.parse("http://openweathermap.org/img/wn/01d@2x.png"));
+
             RemoteViewsTarget target = new RemoteViewsTarget(context, views, R.id.weather, appWidgetIds);
             Picasso.get().load("http://openweathermap.org/img/wn/" + preferences.getString(MainActivity.WWPREF_ICON, "") + "@2x.png").into(target);
-           // ImageView imageView = views.findViewById(R.id.my_image_view);
 
 
 
@@ -134,14 +96,13 @@ public class WeatherWidget extends AppWidgetProvider {
         views.setViewVisibility(R.id.update, View.INVISIBLE);*/
         views.setViewVisibility(R.id.progress, View.INVISIBLE);
         views.setViewVisibility(R.id.update, View.VISIBLE);
-        // Tell the AppWidgetManager to perform an update on the app
-        // widgets.
+
         appWidgetManager.updateAppWidget(appWidgetIds, views);
 
 
     }
 
-    private void FindWeather(String city, RemoteViews views, SharedPreferences preferences, Context context, int[] appWidgetIds) {
+    private void FindWeather(String city, RemoteViews views, Context context, int[] appWidgetIds) {
 
 
 
@@ -272,15 +233,6 @@ public class WeatherWidget extends AppWidgetProvider {
                             savePref(String.valueOf(temp), count, city, icon, date, String.valueOf(lat_find), String.valueOf(long_find), wind_find,humidity_find,
                                     pressure_find, String.valueOf(mintemp), String.valueOf(maxtemp), String.valueOf(feels_find),formattedSunrise,formattedSunset,desc,context);
 
-
-
-
-                        /*// Dans la classe MainActivity, après avoir mis à jour les données
-                        // Créer un Intent pour envoyer les données mises à jour au widget
-                        Intent intent = new Intent(MainActivity.this, WeatherWidget.class);
-                        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                        // intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-                        sendBroadcast(intent);*/
 
 
                         } catch (JSONException e) {

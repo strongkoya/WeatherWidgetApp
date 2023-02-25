@@ -74,7 +74,7 @@ public class WeatherDialogFragment extends DialogFragment {
 
 
         if(isNetworkAvailable(getContext())&&preferences.contains(MainActivity.WWPREF_CITY)){
-            FindWeather(preferences.getString(MainActivity.WWPREF_CITY, ""), fragmentView, preferences, getContext());
+            FindForecast(preferences.getString(MainActivity.WWPREF_CITY, ""), getContext());
         }else{
             //verifier votre connexion
         }
@@ -112,7 +112,7 @@ public class WeatherDialogFragment extends DialogFragment {
 
 
     }
-    private void FindWeather(String city, View view, SharedPreferences preferences, Context context) {
+    private void FindForecast(String city, Context context) {
 
 
 

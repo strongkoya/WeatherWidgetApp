@@ -2,6 +2,7 @@ package com.example.weatherapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
 import android.appwidget.AppWidgetManager;
@@ -23,7 +24,6 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -54,20 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String WWPREF_DATE = "wwpref_date";
     public static final String WWPREF_DESC = "wwpref_desc";
-    public static final String WWPREF_LOCN = "wwpref_locn";
-    public static final String WWPREF_CENT = "wwpref_cent";
-    public static final String WWPREF_FAHR = "wwpref_fahr";
     public static final String WWPREF_WIND = "wwpref_wind";
     public static final String WWPREF_HUMD = "wwpref_humd";
-    public static final String WWPREF_PRCP = "wwpref_prcp";
     public static final String WWPREF_TEMP = "wwpref_temp";
-
-    public static final int CENTIGRADE = 1;
-    public static final int FAHRENHEIT = 2;
-
     public static final int ADDRESSES = 10;
-    public static final String ADDR_FORMAT = "%s, %s, %s";
-    public static final String GOOGLE_URL = "https://www.google.com/search?hl=en&q=weather %s";
     public static final String WWPREF_COUNTRY = "WWPREF_COUNTRY";
     public static final String WWPREF_CITY = "WWPREF_CITY";
     public static final String WWPREF_ICON = "WWPREF_ICON";
@@ -89,17 +79,12 @@ public class MainActivity extends AppCompatActivity {
     Button button, locate, forecast;
     ImageView imageView;
     TextView temptv, time, longitude, latitude, humidity, sunrise, sunset, pressure, wind, country, city_nam, max_temp, min_temp, feels;
-    private ViewGroup dayGroup;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /*IntentFilter filter = new IntentFilter("ACTION_MY_METHOD");
-        registerReceiver(myBroadcastReceiver, filter);
-*/
-
 
         editText = findViewById(R.id.editTextTextPersonName);
         button = findViewById(R.id.button);
@@ -122,14 +107,13 @@ public class MainActivity extends AppCompatActivity {
         min_temp = findViewById(R.id.min_temp);
         feels = findViewById(R.id.feels);
 
+
+        refresh();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Toast.makeText(getApplicationContext(), city,Toast.LENGTH_LONG).show();
                 if (TextUtils.isEmpty(editText.getText())) {
-                    /**
-                     *   You can Toast a message here that the Username is Empty
-                     **/
 
                     editText.setError("City Name is required to search manually");
 
@@ -144,20 +128,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                        checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
-                                != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]
-                            {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMS);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMS);
                     return;
                 }
+
 
                 LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 String provider = locationManager.getBestProvider(new Criteria(), true);
                 listener = new LocationListener() {
                     @Override
                     public void onLocationChanged(@NonNull Location location) {
-                        // located(location);
                     }
 
                     @Override
@@ -184,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
+                    //located(location) affecte à city le nom de la cité via getAdminArea()
                     located(location);
                     FindWeather(city);
                     // Toast.makeText(getApplicationContext(),location.toString(),Toast.LENGTH_LONG).show();
@@ -198,14 +180,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 WeatherDialogFragment dialogFragment = new WeatherDialogFragment();
-
-
                 dialogFragment.show(getSupportFragmentManager(), "weather_fragment_tag");
 
             }
         });
 
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Code à exécuter lorsqu'un swipe est détecté
+                // Par exemple, vous pouvez appeler une fonction pour rafraîchir les données
+                refreshDataAfterSwipe();
+            }
+        });
+
     }
+
+
 
     @Override
     protected void onStart() {
@@ -336,25 +328,11 @@ public class MainActivity extends AppCompatActivity {
                             savePref(String.valueOf(temp), count, city, icon, date, String.valueOf(lat_find), String.valueOf(long_find), wind_find, humidity_find,
                                     pressure_find, String.valueOf(mintemp), String.valueOf(maxtemp), String.valueOf(feels_find), formattedSunrise, formattedSunset, desc);
 
-                            // Create an Intent to update Weather widget
-                            /*int[] appWidgetIds = new int[0];
-                            Intent updateIntent = new Intent(getApplicationContext(), WeatherWidget.class);
-                            updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                            updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,appWidgetIds);
-                            PendingIntent pendingUpdate = PendingIntent.getBroadcast(getApplicationContext(), 0, updateIntent,PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-*/
 
                             //mettre à jour le widget
-                            updateWidget(count,city,desc,date,temp,wind_find,pressure_find,humidity_find,icon);
+                            updateWidget(count, city,date , desc, temp, wind_find, pressure_find, humidity_find, icon);
 
 
-
-                        /*// Dans la classe MainActivity, après avoir mis à jour les données
-                        // Créer un Intent pour envoyer les données mises à jour au widget
-                        Intent intent = new Intent(MainActivity.this, WeatherWidget.class);
-                        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                        // intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-                        sendBroadcast(intent);*/
 
 
                         } catch (JSONException e) {
@@ -366,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if(!isNetworkAvailable(getApplicationContext())){
+                if (!isNetworkAvailable(getApplicationContext())) {
                     Toast.makeText(getApplicationContext(), "Il n'y a pas de connexion, veuillez l'activer!!!", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Essayez une autre ville !!!", Toast.LENGTH_LONG).show();
@@ -405,19 +383,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            /*String locality = null;
-            for (Address address: addressList.toArray(new Address[0]))
-            {
-                if (address.getLocality() != null)
-                {
-                    locality = String.format(ADDR_FORMAT,
-                            address.getLocality(),
-                            address.getSubAdminArea(),
-                            address.getCountryName());
-                    break;
-                }
-            }*/
-            // Toast.makeText(getApplicationContext(),locality.toString(),Toast.LENGTH_LONG).show();
 
             city = addressList.get(0).getAdminArea();
             // Toast.makeText(getApplicationContext(), city,Toast.LENGTH_LONG).show();
@@ -484,13 +449,15 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
     // Vérifie si le terminal est connecté à Internet
     private boolean isNetworkAvailable(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnected();
     }
-    public void updateWidget(String count, String city,String date, String desc, Double temp, String wind_find, String pressure_find, int humidity_find, String icon){
+
+    public void updateWidget(String count, String city, String date, String desc, Double temp, String wind_find, String pressure_find, int humidity_find, String icon) {
         // Créer une instance de AppWidgetManager
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
         // Récupérer l'ID de votre widget
@@ -498,18 +465,32 @@ public class MainActivity extends AppCompatActivity {
         // Créer une instance de RemoteViews avec les mises à jour que vous souhaitez appliquer au widget
         RemoteViews views = new RemoteViews(getPackageName(), R.layout.widget_layout);
         // views.setTextViewText(R.id.location, "Nouveau");
-        views.setTextViewText(R.id.location,count+", "+city);
+        views.setTextViewText(R.id.location, count + ", " + city);
         views.setTextViewText(R.id.date, date);
-        views.setTextViewText(R.id.description,desc);
-        views.setTextViewText(R.id.centigrade,String.valueOf(temp)+" °C");
-        views.setTextViewText(R.id.wind,wind_find+" km/h");
-        views.setTextViewText(R.id.pressure,"Pressure :"+pressure_find+" Pa");
-        views.setTextViewText(R.id.humidity, "Humidity :"+humidity_find+" %");
+        views.setTextViewText(R.id.description, desc);
+        views.setTextViewText(R.id.centigrade, temp + " °C");
+        views.setTextViewText(R.id.wind, wind_find + " km/h");
+        views.setTextViewText(R.id.pressure, "Pressure :" + pressure_find + " Pa");
+        views.setTextViewText(R.id.humidity, "Humidity :" + humidity_find + " %");
         RemoteViewsTarget target = new RemoteViewsTarget(getApplicationContext(), views, R.id.weather, appWidgetIds);
         Picasso.get().load("http://openweathermap.org/img/wn/" + icon + "@2x.png").into(target);
 
         // Mettre à jour le widget en appelant la méthode updateAppWidget() avec l'ID du widget et l'instance de RemoteViews
         appWidgetManager.updateAppWidget(appWidgetIds, views);
+    }
+
+    private void refresh() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        if (isNetworkAvailable(getApplicationContext())&&preferences.contains(MainActivity.WWPREF_CITY))
+        {
+            FindWeather(preferences.getString(MainActivity.WWPREF_CITY,""));
+        }
+    }
+    private void refreshDataAfterSwipe() {
+        refresh();
+        // Indiquez que le SwipeRefreshLayout est terminé de se rafraîchir
+        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 
