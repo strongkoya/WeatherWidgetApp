@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     //located(location) affecte à city le nom de la cité via getAdminArea()
                     located(location);
                     FindWeather(city);
-                    // Toast.makeText(getApplicationContext(),location.toString(),Toast.LENGTH_LONG).show();
+                     Toast.makeText(getApplicationContext(),city,Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "La localisation est désactivée, veuillez l'activer ou bien chercher une autre ville!!!", Toast.LENGTH_LONG).show();
 
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(getApplicationContext(), "Essayez une autre ville !!!", Toast.LENGTH_LONG).show();
                 }
-                // Toast.makeText(MainActivity.this,error.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+                 //Toast.makeText(MainActivity.this,error.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -384,9 +384,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            city = addressList.get(0).getAdminArea();
-            // Toast.makeText(getApplicationContext(), city,Toast.LENGTH_LONG).show();
-
+           // city = addressList.get(0).getAdminArea();
+          // city = addressList.get(0).getLocality();
+         //   city = addressList.get(0).getAddressLine(0);
+          //  city = addressList.get(0).getCountryName();
+            //city =  addressList.get(0).getAddressLine(1);
+          //   Toast.makeText(getApplicationContext(), city,Toast.LENGTH_LONG).show();
+            // city = (addressList.get(0).getLocality() != null && !addressList.get(0).getLocality().isEmpty()) ? addressList.get(0).getLocality() : addressList.get(0).getCountryName();
+            String adminArea = addressList.get(0).getAdminArea();
+            city = (adminArea != null && !adminArea.isEmpty()) ? adminArea.replaceAll(" Governorate$", "") : addressList.get(0).getCountryName();
 
         } catch (Exception e) {
 
